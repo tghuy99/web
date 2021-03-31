@@ -5,8 +5,19 @@
 		$hinhanh = $_POST['hinhanh'];
 		$gia = $_POST['giasanpham'];
 		$soluong = $_POST['soluong'];
-		$sql_giohang = mysqli_query($mysqli, "INSERT INTO tbl_giohang(tensanpham, sanpham_id, hinhanh, giasanpham, soluong) VALUES ('$tensanpham','$sanpham_id','$hinhanh','$gia','$soluong')");
-		if ($sql_giohang==0){
+		
+		$sql_select_giohang = mysqli_query($mysqli, "SELECT * FROM tbl_giohang WHERE sanpham_id='$sanpham_id'");
+		$count = mysqli_num_rows($sql_select_giohang);
+		if ($count>0){
+			$row_sanpham = mysqli_fetch_array($sql_select_giohang);
+			$soluong = $row_sanpham['soluong']+1;
+			$sql_giohang ="UPDATE tbl_giohang SET soluong='$soluong' WHERE sanpham_id='$sanpham_id'";
+		}else{
+			$soluong = $soluong;
+			$sql_giohang ="INSERT INTO tbl_giohang(tensanpham, sanpham_id, hinhanh, giasanpham, soluong) VALUES ('$tensanpham','$sanpham_id','$hinhanh','$gia','$soluong')";
+		}
+		$insert_row = mysqli_query($mysqli, $sql_giohang);
+		if ($insert_row==0){
 			header('Location: index.php?quanly=chitietsp&id='.$sanpham_id);
 		}
 	}
@@ -21,7 +32,10 @@
 			</h3>
 			<!-- //tittle heading -->
 			<div class="checkout-right">
-				
+				<?php
+					$sql_lay_giohang = mysqli_query($mysqli, "SELECT * FROM tbl_giohang ORDER BY giohang_id DESC");
+
+				?>
 				<div class="table-responsive">
 					<table class="timetable_sub">
 						<thead>
@@ -29,40 +43,48 @@
 								<th>Thứ tự</th>
 								<th>Sản phẩm</th>
 								<th>Số lượng</th>
-								<th>Tên sản phẩm/th>
+								<th>Tên sản phẩm</th>
 
 								<th>Giá</th>
-								<th>Remove</th>
+								<th>Giá tổng</th>
+								<th>Quản lý</th>
 							</tr>
 						</thead>
 						<tbody>
+						<?php
+							$i=0;
+							$total=0;
+							while ($row_fetch_giohang = mysqli_fetch_array($sql_lay_giohang)){
+								$subtotal = $row_fetch_giohang['soluong']*$row_fetch_giohang['giasanpham'];
+								$total += $subtotal;
+								$i++;
+						?>
 							<tr class="rem1">
-								<td class="invert">1</td>
+								<td class="invert"><?php echo $i ?></td>
 								<td class="invert-image">
 									<a href="single.html">
-										<img src="images/a.jpg" alt=" " class="img-responsive">
+										<img src="images/<?php echo $row_fetch_giohang['hinhanh'] ?>.jpg" alt=" " height="80" class="img-responsive">
 									</a>
 								</td>
 								<td class="invert">
-									<div class="quantity">
-										<div class="quantity-select">
-											<div class="entry value-minus">&nbsp;</div>
-											<div class="entry value">
-												<span>1</span>
-											</div>
-											<div class="entry value-plus active">&nbsp;</div>
-										</div>
-									</div>
+									<input type="number" min="1" name="soluong" value="<?php echo $row_fetch_giohang['soluong'] ?>">
 								</td>
-								<td class="invert">Back Cover</td>
-								<td class="invert">$259</td>
+								<td class="invert"><?php echo $row_fetch_giohang['tensanpham'] ?></td>
+								<td class="invert"><?php echo number_format($row_fetch_giohang['giasanpham']).' vnđ' ?></td>
+								<td class="invert"><?php echo number_format($subtotal).' vnđ' ?></td>
 								<td class="invert">
 									<div class="rem">
 										<div class="close1"> </div>
 									</div>
 								</td>
 							</tr>
-							
+							<?php } ?>
+							<tr>
+								<td colspan="7">Tổng tiền: <?php echo number_format($total).' vnđ' ?></td>
+							</tr>
+							<tr>
+								<td colspan="7"><input type="submit" class="btn btn-success" value="Cập nhật giỏ hàng" name="capnhatsoluong"></td>
+							</tr>
 						</tbody>
 					</table>
 				</div>
