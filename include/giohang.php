@@ -40,7 +40,19 @@
 		$note = $_POST['note'];
 		$address = $_POST['address'];
 		$giaohang = $_POST['giaohang'];
-		$sql_khachhang = mysqli_query($mysqli,"INSERT INTO tbl_khachhang(name, phone, address, note, email, giaohang) VALUES ('$name','$phone','$address','$note','$email','$giaohang')");
+		$sql_khachhang = mysqli_query($mysqli, "INSERT INTO tbl_khachhang(name, phone, address, note, email, giaohang) VALUES ('$name','$phone','$address','$note','$email','$giaohang')");
+		if($sql_khachhang){ //check -> insert data
+			$sql_select_khachhang = mysqli_query($mysqli, "SELECT * FROM tbl_khachhang ORDER BY khachhang_id DESC LIMIT 1");
+			$mahang = rand(0, 9999);
+			$row_khachhang = mysqli_fetch_array($sql_select_khachhang);
+			$khachhang_id = $row_khachhang['khachhang_id'];
+			for ($i=0; $i<count($_POST['thanhtoan_product_id']); $i++){ //them don hang
+				$sanpham_id = $_POST['thanhtoan_product_id'][$i];
+				$soluong = $_POST['thanhtoan_soluong'][$i];
+				$sql_khachhang = mysqli_query($mysqli, "INSERT INTO tbl_donhang(sanpham_id, khachhang_id, soluong, mahang) VALUES ('$sanpham_id','$khachhang_id','$soluong','$mahang')");
+				$sql_delete_thanhtoan = mysqli_query($mysqli, "DELETE FROM tbl_giohang WHERE sanpham_id='$sanpham_id'");
+			}
+		}
 	}
 ?>
 
@@ -84,7 +96,7 @@
 							<tr class="rem1">
 								<td class="invert"><?php echo $i ?></td>
 								<td class="invert-image">
-									<a href="single.html">
+									<a href="#">
 										<img src="images/<?php echo $row_fetch_giohang['hinhanh'] ?>.jpg" alt=" " height="80" class="img-responsive">
 									</a>
 								</td>
@@ -101,7 +113,7 @@
 									</div>
 								</td>
 							</tr>
-							<?php } ?>
+						<?php } ?>
 							<tr>
 								<td colspan="7">Tổng tiền: <?php echo number_format($total).' vnđ' ?></td>
 							</tr>
@@ -116,7 +128,7 @@
 			<div class="checkout-left">
 				<div class="address_form_agile mt-sm-5 mt-4">
 					<h4 class="mb-sm-4 mb-3">Thêm địa chỉ giao hàng</h4>
-					<form action="payment.html" method="post" class="creditly-card-form agileinfo_form">
+					<form action="" method="post" class="creditly-card-form agileinfo_form">
 						<div class="creditly-wrapper wthree, w3_agileits_wrapper">
 							<div class="information-wrapper">
 								<div class="first-row">
@@ -139,7 +151,7 @@
 										<input type="text" class="form-control" placeholder="email" name="email" required="">
 									</div>
 									<div class="controls form-group">
-										<textarea style="resize: none;" type="text" class="form-control" placeholder="Ghi chú" name="email" required=""></textarea>
+										<textarea style="resize: none;" type="text" class="form-control" placeholder="Ghi chú" name="note" required=""></textarea>
 									</div>
 									<div class="controls form-group">
 										<select class="option-w3ls" name="giaohang">
@@ -150,6 +162,13 @@
 										</select>
 									</div>
 								</div>
+								<?php 
+									$sql_lay_giohang = mysqli_query($mysqli, "SELECT * FROM tbl_giohang ORDER BY giohang_id DESC");
+									while ($row_thanhtoan = mysqli_fetch_array($sql_lay_giohang)){
+									?>
+										<input type="hidden" name="thanhtoan_product_id[]" value="<?php echo $row_thanhtoan['sanpham_id'] ?>">
+										<input type="hidden" name="thanhtoan_soluong[]" value="<?php echo $row_thanhtoan['soluong'] ?>">
+									<?php } ?>
 								<input style="width:20%;" value="Thanh toán" type="submit" name="thanhtoan" class="btn btn-success">
 							</div>
 						</div>
