@@ -46,16 +46,12 @@
 											<div class="snipcart-details top_brand_home_details item_add single-item hvr-outline-out">
 												<form action="?quanly=giohang" method="post">
 													<fieldset>
-														<input type="hidden" name="cmd" value="_cart" />
-														<input type="hidden" name="add" value="1" />
-														<input type="hidden" name="business" value=" " />
-														<input type="hidden" name="item_name" value="Samsung Galaxy J7" />
-														<input type="hidden" name="amount" value="200.00" />
-														<input type="hidden" name="discount_amount" value="1.00" />
-														<input type="hidden" name="currency_code" value="USD" />
-														<input type="hidden" name="return" value=" " />
-														<input type="hidden" name="cancel_return" value=" " />
-														<input type="submit" name="submit" value="Thêm giỏ hàng" class="button btn" />
+														<input type="hidden" name="tensanpham" value="<?php echo $row_sanpham['sanpham_name'] ?>" />
+														<input type="hidden" name="sanpham_id" value="<?php echo $row_sanpham['sanpham_id'] ?>" />
+														<input type="hidden" name="giasanpham" value="<?php echo $row_sanpham['sanpham_gia'] ?>" />
+														<input type="hidden" name="hinhanh" value="<?php echo $row_sanpham['sanpham_image'] ?>" />
+														<input type="hidden" name="soluong" value="1" />
+														<input type="submit" name="themgiohang" value="Thêm giỏ hàng" class="button" />
 													</fieldset>
 												</form>
 											</div>

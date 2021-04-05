@@ -20,6 +20,27 @@
 		if ($insert_row==0){
 			header('Location: index.php?quanly=chitietsp&id='.$sanpham_id);
 		}
+	}elseif(isset($_POST['capnhatsoluong'])){ //cap nhat so luong san pham
+		for($i=0;$i<count($_POST['product_id']); $i++){
+			$sanpham_id = $_POST['product_id'][$i];
+			$soluong = $_POST['soluong'][$i];
+			if($soluong <= 0){
+				$sql_update = mysqli_query($mysqli, "DELETE FROM tbl_giohang WHERE sanpham_id='$sanpham_id'");
+			}else{
+				$sql_update = mysqli_query($mysqli, "UPDATE tbl_giohang SET soluong='$soluong' WHERE sanpham_id='$sanpham_id'");
+			}
+		}
+	}elseif(isset($_GET['xoa'])){ //xoa gio hang
+		$id = $_GET['xoa'];
+		$sql_delete = mysqli_query($mysqli, "DELETE FROM tbl_giohang WHERE giohang_id='$id'");
+	}elseif(isset($_POST['thanhtoan'])){
+		$name = $_POST['name'];
+		$phone = $_POST['phone'];
+		$email = $_POST['email'];
+		$note = $_POST['note'];
+		$address = $_POST['address'];
+		$giaohang = $_POST['giaohang'];
+		$sql_khachhang = mysqli_query($mysqli,"INSERT INTO tbl_khachhang(name, phone, address, note, email, giaohang) VALUES ('$name','$phone','$address','$note','$email','$giaohang')");
 	}
 ?>
 
@@ -37,6 +58,7 @@
 
 				?>
 				<div class="table-responsive">
+				<form action="" method="POST">
 					<table class="timetable_sub">
 						<thead>
 							<tr>
@@ -67,14 +89,15 @@
 									</a>
 								</td>
 								<td class="invert">
-									<input type="number" min="1" name="soluong" value="<?php echo $row_fetch_giohang['soluong'] ?>">
+									<input type="number" min="1" name="soluong[]" value="<?php echo $row_fetch_giohang['soluong'] ?>">
+									<input type="hidden" name="product_id[]" value="<?php echo $row_fetch_giohang['sanpham_id'] ?>">
 								</td>
 								<td class="invert"><?php echo $row_fetch_giohang['tensanpham'] ?></td>
 								<td class="invert"><?php echo number_format($row_fetch_giohang['giasanpham']).' vnđ' ?></td>
 								<td class="invert"><?php echo number_format($subtotal).' vnđ' ?></td>
 								<td class="invert">
 									<div class="rem">
-										<div class="close1"> </div>
+										<a href="?quanly=giohang&xoa=<?php echo $row_fetch_giohang['giohang_id'] ?>">Xóa</a>
 									</div>
 								</td>
 							</tr>
@@ -87,6 +110,7 @@
 							</tr>
 						</tbody>
 					</table>
+				</form>
 				</div>
 			</div>
 			<div class="checkout-left">
@@ -97,34 +121,36 @@
 							<div class="information-wrapper">
 								<div class="first-row">
 									<div class="controls form-group">
-										<input class="billing-address-name form-control" type="text" name="name" placeholder="Full Name" required="">
+										<input class="billing-address-name form-control" type="text" name="name" placeholder="Điền họ tên" required="">
 									</div>
 									<div class="w3_agileits_card_number_grids">
 										<div class="w3_agileits_card_number_grid_left form-group">
 											<div class="controls">
-												<input type="text" class="form-control" placeholder="Mobile Number" name="number" required="">
+												<input type="text" class="form-control" placeholder="Số điện thoại" name="phone" required="">
 											</div>
 										</div>
 										<div class="w3_agileits_card_number_grid_right form-group">
 											<div class="controls">
-												<input type="text" class="form-control" placeholder="Landmark" name="landmark" required="">
+												<input type="text" class="form-control" placeholder="Địa chỉ" name="address" required="">
 											</div>
 										</div>
 									</div>
 									<div class="controls form-group">
-										<input type="text" class="form-control" placeholder="Town/City" name="city" required="">
+										<input type="text" class="form-control" placeholder="email" name="email" required="">
 									</div>
 									<div class="controls form-group">
-										<select class="option-w3ls">
-											<option>Select Address type</option>
-											<option>Office</option>
-											<option>Home</option>
-											<option>Commercial</option>
+										<textarea style="resize: none;" type="text" class="form-control" placeholder="Ghi chú" name="email" required=""></textarea>
+									</div>
+									<div class="controls form-group">
+										<select class="option-w3ls" name="giaohang">
+											<option>Chọn hình thức giao hàng</option>
+											<option value="1">Thanh toán ATM</option>
+											<option value="0">Nhận tiền tại nhà</option>
 
 										</select>
 									</div>
 								</div>
-								<button class="submit check_out btn">Thanh toán tới địa chỉ này</button>
+								<input style="width:20%;" value="Thanh toán" type="submit" name="thanhtoan" class="btn btn-success">
 							</div>
 						</div>
 					</form>
